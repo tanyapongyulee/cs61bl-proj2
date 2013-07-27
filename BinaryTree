@@ -1,0 +1,186 @@
+import java.util.*;
+
+
+public class BinaryTree {
+
+  private TreeNode myRoot;
+	
+	public BinaryTree ( ) {
+		myRoot = null;
+	}
+	
+	public BinaryTree (TreeNode t) {
+		myRoot = t;
+	}
+	
+	// Print the values in the tree in inorder: values in the left
+	// subtree first (in inorder), then the root value, then values
+	// in the right subtree (in inorder).
+	public void printInorder ( ) {
+		printInorder (myRoot);
+		System.out.println ( );
+	}
+
+	private static void printInorder (TreeNode t) {
+		if (t != null) {
+			printInorder (t.myLeft);
+			System.out.print (t.myItem + " ");
+			printInorder (t.myRight);
+		}
+	}
+
+
+	private static class TreeNode {
+		
+		public Object myItem;
+		public TreeNode myLeft;
+		public TreeNode myRight;
+		
+		public TreeNode (Object obj) {
+			myItem = obj;
+			myLeft = myRight = null;
+		}
+		
+		public TreeNode (Object obj, TreeNode left, TreeNode right) {
+			myItem = obj;
+			myLeft = left;
+			myRight = right;
+		}
+	}
+	
+	public static BinaryTree exprTree (String s) {
+	    BinaryTree result = new BinaryTree ( );
+	    result.myRoot = result.exprTreeHelper (s);
+	    return result;
+	}
+	// Return the tree corresponding to the given arithmetic expression.
+	// The expression is legal, fully parenthesized, contains no blanks, 
+	// and involves two variables, =>,|, &.
+	private TreeNode exprTreeHelper (String expr) {
+	    if (expr.charAt (0) != '(' && expr.charAt(0)!='~') {
+	        return new TreeNode(expr.charAt(0),null,null); 
+	    }else if(expr.charAt(0)=='~'&&expr.length()==2){
+	    	return new TreeNode(expr.charAt(0),new TreeNode(expr.charAt(1)),null); 
+	    } else {
+	        // expr is a parenthesized expression.
+	        // Strip off the beginning and ending parentheses,
+	        // find the main operator (an occurrence of + or * not nested
+	        // in parentheses, and construct the two subtrees.
+	        int nesting = 0;
+	        String op="";
+	        String opnd1=""; 
+	        String opnd2="";
+	        int opPos = 0;
+	        int opPos2 =0; //deal specifically with =>
+	        boolean addNot=false;
+	        
+	        for (int k=0; k<expr.length()-1; k++) {
+	        	if(expr.charAt(k)=='('){
+	        		nesting++;
+	        	}else if(expr.charAt(k)==')'){
+	        		nesting--;        	
+	        	}else if(expr.charAt(k)=='~'&&nesting==1&& expr.charAt(k+1)=='('){
+	        		addNot=true;
+	        	}else if(expr.charAt(k)=='='&&nesting==1){
+	        			opPos2=k;
+	        			opnd1 = expr.substring (1, opPos2);
+	        			opnd2 = expr.substring (opPos2+2, expr.length()-1);
+	        			op = expr.substring (opPos2, opPos2+2);
+	        			break;
+	        	}else if((expr.charAt(k)=='|'||expr.charAt(k)=='&')&&(nesting==1)){	  
+	        			opPos=k;
+	        			opnd1 = expr.substring (1, opPos);
+	        			opnd2 = expr.substring (opPos+1, expr.length()-1);
+	        			op = expr.substring (opPos, opPos+1);
+	        			break;
+	        		
+	        	}
+	        }
+	        if (addNot){
+	        	op="~"+op;
+	        	addNot=false;
+	        	opnd1=opnd1.substring(1);
+	        }
+	        	System.out.println ("expression = " + expr);
+	        	System.out.println ("operand 1  = " + opnd1);
+	        	System.out.println ("operator   = " + op);
+	        	System.out.println ("operand 2  = " + opnd2);
+	        	System.out.println ( );
+	        	return new TreeNode(op,exprTreeHelper(opnd1),exprTreeHelper(opnd2));
+	    }
+	    
+	    
+	    
+	    }
+	    public void fillSampleTree1 ( ) {
+			myRoot =
+			    new TreeNode ("a",
+				new TreeNode ("b"),
+				new TreeNode ("c"));
+		}
+
+		public void fillSampleTree2 ( ) {
+			myRoot =
+			    new TreeNode ("a",
+				new TreeNode ("b", new TreeNode ("d",	new TreeNode ("e"), new TreeNode ("f")), null),
+				new TreeNode ("c"));
+		}
+		
+		
+		public void print ( ) {
+		    if (myRoot != null) {
+		        printHelper (myRoot, 0);
+		    }
+		}
+		private static void println (Object obj, int indent) {
+		    for (int k=0; k<=indent; k++) {
+		        System.out.print (indent1);
+		    }
+		    System.out.println (obj);
+		}
+			
+		private static final String indent1 = "    ";
+
+
+		
+		private static void printHelper (TreeNode root, int indent){
+		 		
+				if (root.myRight !=null){
+		 			indent++;
+		 			TreeNode temp = root.myRight;
+		 			printHelper (temp, indent);
+		 			indent--;
+		 		}
+		 		println(root.myItem, indent-1);
+		 		//print the right end child
+		 		if (root.myLeft!=null){
+		 			indent++;
+		 			TreeNode temp = root.myLeft;
+		 			printHelper(temp,indent);
+		 			indent--;
+		 		} 
+
+		 	}
+		
+		
+	public static void main (String [ ] args) {
+		
+		BinaryTree tree1=BinaryTree.exprTree("(a|b)");
+		tree1.print();
+		tree1.printInorder();
+		//BinaryTree tree2=BinaryTree.exprTree("((a|(b&(a=>b)))=>(a|b))");
+		//tree2.print();
+		BinaryTree tree3=BinaryTree.exprTree("(~a|b)");
+		tree3.print();
+		tree3.printInorder();
+		BinaryTree tree4=BinaryTree.exprTree("(~(~a|b)=>a)");
+		tree4.print();
+		tree4.printInorder();
+		BinaryTree tree5 = BinaryTree.exprTree("(~(~a|~b)=>~a)");
+		tree5.print();
+		tree5.printInorder();
+		
+		
+		
+	}
+}
