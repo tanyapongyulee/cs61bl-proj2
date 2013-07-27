@@ -1,0 +1,109 @@
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+
+public class ProofTest {
+
+  @Test
+	public void test() {
+		fail("Not yet implemented");
+	}
+	TheoremSet check;
+	
+	//testing isOkay and basic line number
+	public void testProof1(){
+		 Proof soFar = new Proof (check);
+		 LineNumber numba1=soFar.nextLineNumber ( );
+		 assertEquals(numba1, 1);// checking line number
+		 System.out.print (numba1 + "\t");
+		 try{soFar.extendProof("show (q=>q)");
+		 }catch (IllegalLineException e) {
+         } catch (IllegalInferenceException e) {
+         }
+		 assertFalse(soFar.isComplete()); // checking isComplete
+		 LineNumber numba2=soFar.nextLineNumber ( );
+		 assertEquals(numba2, 2);//checking line number
+		 System.out.print (numba2 + "\t");
+		 
+		 try{soFar.extendProof("assume q");
+		 }catch (IllegalLineException e) {     
+         } catch (IllegalInferenceException e) {
+         }assertFalse(soFar.isComplete()); // checking isComplete
+         LineNumber numba3=soFar.nextLineNumber ( );
+		 assertEquals(numba3, 3); //checking line number
+		 System.out.print (numba3 + "\t");
+		
+		 try{soFar.extendProof("ic 2 (q=>q)");
+		 }catch (IllegalLineException e) {
+		 }catch (IllegalInferenceException e) {
+		 }assertTrue(soFar.isComplete()); // checking isComplete
+	}
+	
+	public void testInvalidTest(){
+		Proof soFar = new Proof (check);
+		boolean error1=false, error2=false, error3=false;
+		
+		try{soFar.extendProof("show(q=>q)");
+		 }catch (IllegalLineException e) {
+            System.out.println (e.getMessage());
+            error1=true;
+        } catch (IllegalInferenceException e) {
+            System.out.println (e.getMessage());
+        }assertTrue(error1);           // catching IllegalLineException
+		
+        try{soFar.extendProof("show (q=>q) p");
+		 }catch (IllegalLineException e) {
+           System.out.println (e.getMessage());
+           error2=true;
+       } catch (IllegalInferenceException e) {
+           System.out.println (e.getMessage());
+       }assertTrue(error2); // catching IllegalLineException
+       
+       try{soFar.extendProof("(q=>q)");
+		 }catch (IllegalLineException e) {
+          System.out.println (e.getMessage());
+          error3=true;
+      } catch (IllegalInferenceException e) {
+          System.out.println (e.getMessage());
+      }assertTrue(error3); 
+	}
+	
+	public void testSubProof(){
+		Proof soFar= new Proof(check);
+		soFar.nextLineNumber ( );
+		try{soFar.extendProof("show (p=>(~p=>q))");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		soFar.nextLineNumber ( );
+		try{soFar.extendProof("assume p");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		soFar.nextLineNumber ( );
+		try{soFar.extendProof("show (~p=>q)");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		LineNumber number=soFar.nextLineNumber ( );
+		assertEquals(number, 3.1);
+		try{soFar.extendProof("assume ~p");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		number=soFar.nextLineNumber ( );
+		assertEquals(number, 3.2);
+		try{soFar.extendProof("co 2 3.1 (~p=>q)");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		number=soFar.nextLineNumber ( );
+		assertEquals(number, 4);
+		try{soFar.extendProof("ic 3 (p=>(~p=>q))");
+		}catch (IllegalInferenceException e) {	
+		}catch (IllegalLineException e) {}
+		assertTrue(soFar.isComplete());
+	
+	}
+}
+
+	
+	
+
+
